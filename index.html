@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CompeteIQ – AI Competitive Analysis Bot</title>
+    <meta name="description"
+        content="Enter two companies and get a structured AI-powered SWOT competitive analysis in seconds using Groq's blazing-fast LLM." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+            </div>
+            <span class="logo-text">CompeteIQ</span>
+        </div>
+        <div class="header-badge">
+            <span class="pulse-dot" id="statusDot"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-tag">🏆 AI-Powered Business Intelligence</div>
+            <h1 class="hero-title">
+                Competitive Analysis
+                <span class="gradient-text">in Seconds</span>
+            </h1>
+            <p class="hero-subtitle">
+                Enter any two companies and get a deep, structured <strong>SWOT comparison</strong>
+                powered by Groq's blazing-fast AI — completely free.
+            </p>
+        </section>
+
+        <!-- Company Input Section -->
+        <section class="input-section">
+            <div class="vs-card">
+                <div class="company-input-wrap">
+                    <div class="company-field">
+                        <label for="companyA">
+                            <span class="field-badge field-badge-a">Company A</span>
+                        </label>
+                        <div class="company-input-inner">
+                            <span class="company-icon">🏢</span>
+                            <input type="text" id="companyA" class="company-input"
+                                placeholder="e.g. Apple, Tesla, Netflix..." autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="vs-divider">
+                        <div class="vs-circle">VS</div>
+                    </div>
+
+                    <div class="company-field">
+                        <label for="companyB">
+                            <span class="field-badge field-badge-b">Company B</span>
+                        </label>
+                        <div class="company-input-inner">
+                            <span class="company-icon">🏭</span>
+                            <input type="text" id="companyB" class="company-input"
+                                placeholder="e.g. Google, Ford, Disney..." autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Suggestions -->
+                <div class="suggestions">
+                    <span class="suggestion-label">Try:</span>
+                    <button class="suggestion-chip" onclick="fillSuggestion('Apple', 'Samsung')">Apple vs
+                        Samsung</button>
+                    <button class="suggestion-chip" onclick="fillSuggestion('Netflix', 'Disney+')">Netflix vs
+                        Disney+</button>
+                    <button class="suggestion-chip" onclick="fillSuggestion('Tesla', 'Ford')">Tesla vs Ford</button>
+                    <button class="suggestion-chip" onclick="fillSuggestion('Google', 'Microsoft')">Google vs
+                        Microsoft</button>
+                    <button class="suggestion-chip" onclick="fillSuggestion('Uber', 'Lyft')">Uber vs Lyft</button>
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn" onclick="analyzeCompanies()">
+                    <span class="btn-content" id="btnContent">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Analyze Companies
+                    </span>
+                    <span class="btn-loading hidden" id="btnLoading">
+                        <span class="spinner"></span>
+                        Analyzing with Groq AI...
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Error Display -->
+        <div class="error-banner hidden" id="errorBanner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span id="errorMsg"></span>
+        </div>
+
+        <!-- Results Section -->
+        <section class="results-section hidden" id="resultsSection">
+
+            <!-- Summary Banner -->
+            <div class="summary-banner">
+                <div class="summary-companies">
+                    <span class="summary-company-a" id="summaryCompanyA">—</span>
+                    <span class="summary-vs">vs</span>
+                    <span class="summary-company-b" id="summaryCompanyB">—</span>
+                </div>
+                <div class="summary-meta">
+                    <span class="meta-chip">🤖 llama-3.3-70b</span>
+                    <span class="meta-chip" id="analysisTime">⚡ —</span>
+                </div>
+            </div>
+
+            <!-- SWOT Grid -->
+            <div class="swot-grid">
+
+                <!-- Strengths -->
+                <div class="swot-card swot-strengths">
+                    <div class="swot-header">
+                        <div class="swot-icon">💪</div>
+                        <h2 class="swot-title">Strengths</h2>
+                        <div class="swot-subtitle">Internal Positives</div>
+                    </div>
+                    <div class="swot-columns">
+                        <div class="swot-col">
+                            <div class="col-header" id="strengthsAHeader">Company A</div>
+                            <ul class="swot-list" id="strengthsAList"></ul>
+                        </div>
+                        <div class="swot-divider-v"></div>
+                        <div class="swot-col">
+                            <div class="col-header" id="strengthsBHeader">Company B</div>
+                            <ul class="swot-list" id="strengthsBList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weaknesses -->
+                <div class="swot-card swot-weaknesses">
+                    <div class="swot-header">
+                        <div class="swot-icon">⚠️</div>
+                        <h2 class="swot-title">Weaknesses</h2>
+                        <div class="swot-subtitle">Internal Negatives</div>
+                    </div>
+                    <div class="swot-columns">
+                        <div class="swot-col">
+                            <div class="col-header" id="weaknessesAHeader">Company A</div>
+                            <ul class="swot-list" id="weaknessesAList"></ul>
+                        </div>
+                        <div class="swot-divider-v"></div>
+                        <div class="swot-col">
+                            <div class="col-header" id="weaknessesBHeader">Company B</div>
+                            <ul class="swot-list" id="weaknessesBList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunities -->
+                <div class="swot-card swot-opportunities">
+                    <div class="swot-header">
+                        <div class="swot-icon">🚀</div>
+                        <h2 class="swot-title">Opportunities</h2>
+                        <div class="swot-subtitle">External Positives</div>
+                    </div>
+                    <div class="swot-columns">
+                        <div class="swot-col">
+                            <div class="col-header" id="opportunitiesAHeader">Company A</div>
+                            <ul class="swot-list" id="opportunitiesAList"></ul>
+                        </div>
+                        <div class="swot-divider-v"></div>
+                        <div class="swot-col">
+                            <div class="col-header" id="opportunitiesBHeader">Company B</div>
+                            <ul class="swot-list" id="opportunitiesBList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Threats -->
+                <div class="swot-card swot-threats">
+                    <div class="swot-header">
+                        <div class="swot-icon">🔥</div>
+                        <h2 class="swot-title">Threats</h2>
+                        <div class="swot-subtitle">External Negatives</div>
+                    </div>
+                    <div class="swot-columns">
+                        <div class="swot-col">
+                            <div class="col-header" id="threatsAHeader">Company A</div>
+                            <ul class="swot-list" id="threatsAList"></ul>
+                        </div>
+                        <div class="swot-divider-v"></div>
+                        <div class="swot-col">
+                            <div class="col-header" id="threatsBHeader">Company B</div>
+                            <ul class="swot-list" id="threatsBList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Verdict -->
+            <div class="verdict-card">
+                <div class="verdict-header">
+                    <span class="verdict-icon">🏆</span>
+                    <h2>Strategic Verdict</h2>
+                </div>
+                <div class="verdict-body" id="verdictBody"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="result-actions">
+                <button class="action-btn action-copy" id="copyBtn" onclick="copyResults()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    Copy Analysis
+                </button>
+                <button class="action-btn action-new" onclick="resetAnalysis()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1 4 1 10 7 10" />
+                        <path d="M3.51 15a9 9 0 1 0 .49-3.54" />
+                    </svg>
+                    New Analysis
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built with ❤️ using <strong>Groq AI (llama-3.3-70b)</strong> · Flask Backend · Free API</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
